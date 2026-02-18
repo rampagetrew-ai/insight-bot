@@ -1,0 +1,28 @@
+# Core
+aiogram==3.13.1
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.1
+greenlet==3.1.1
+
+# Redis
+redis[hiredis]==5.2.1
+
+# AI
+anthropic==0.42.0
+
+# Astrology (optional, for later phases)
+# flatlib==0.4.1
+# swisseph==2.10.3.2
+
+# Utilities
+python-dotenv==1.0.1
+structlog==24.4.0
+
+# Date/time
+python-dateutil==2.9.0.post0
+pytz==2024.2

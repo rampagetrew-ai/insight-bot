@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  bot:
+    build: .
+    container_name: insight_bot
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - insight_net
+
+  db:
+    image: postgres:16-alpine
+    container_name: insight_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-insight_bot}
+      POSTGRES_USER: ${DB_USER:-insight}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-insight} -d ${DB_NAME:-insight_bot}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - insight_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: insight_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redisdata:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - insight_net
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  insight_net:
+    driver: bridge
