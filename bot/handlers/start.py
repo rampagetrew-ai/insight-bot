@@ -3,9 +3,9 @@
 from aiogram import F, Router
 from aiogram.filters import CommandStart
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.database import User
+from bot.keyboards.inline import main_menu_kb
 
 router = Router(name="start")
 
@@ -26,13 +26,7 @@ async def cmd_start(message: Message, db_user: User) -> None:
         f"Начни с заполнения профиля — это займёт минуту."
     )
     
-    builder = InlineKeyboardBuilder()
-    builder.button(text="📝 Заполнить профиль", callback_data="menu:profile")
-    builder.button(text="🃏 Расклад Таро", callback_data="tarot:menu")
-    builder.button(text="🔢 Нумерология", callback_data="numerology:menu")
-    builder.adjust(1)
-    
-    await message.answer(text, reply_markup=builder.as_markup())
+    await message.answer(text, reply_markup=main_menu_kb())
 
 
 @router.callback_query(F.data == "menu:back")
@@ -40,14 +34,7 @@ async def back_to_menu(callback: CallbackQuery) -> None:
     """Возврат в главное меню."""
     await callback.answer()
     
-    builder = InlineKeyboardBuilder()
-    builder.button(text="📝 Профиль", callback_data="menu:profile")
-    builder.button(text="🃏 Таро", callback_data="tarot:menu")
-    builder.button(text="🔢 Нумерология", callback_data="numerology:menu")
-    builder.button(text="🌟 Астрология", callback_data="menu:astrology")
-    builder.adjust(2)
-    
     await callback.message.edit_text(
         "🏠 <b>Главное меню</b>\n\nВыбери раздел:",
-        reply_markup=builder.as_markup(),
+        reply_markup=main_menu_kb(),
     )
