@@ -1,5 +1,6 @@
 """Хендлер астрологии — натальная карта, транзиты, совместимость."""
 
+import re
 from datetime import datetime
 from typing import Optional
 
@@ -13,6 +14,22 @@ from bot.database import Profile, User, async_session
 from bot.keyboards.inline import back_to_menu_kb
 from bot.services.astrology_engine import astrology, NatalChart
 from bot.utils.personalization import get_time_greeting
+
+
+def parse_date(date_str: str) -> Optional[datetime]:
+    """Парсит дату из строки."""
+    formats = [
+        "%d.%m.%Y",
+        "%d/%m/%Y",
+        "%Y-%m-%d",
+        "%d.%m.%y",
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str.strip(), fmt)
+        except ValueError:
+            continue
+    return None
 
 router = Router(name="astrology")
 
